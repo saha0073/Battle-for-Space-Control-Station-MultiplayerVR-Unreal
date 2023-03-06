@@ -9,6 +9,10 @@
 #include "Engine/GameEngine.h"
 #include "Math/Vector.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
+
 
 // Sets default values
 AVRWeapon::AVRWeapon()
@@ -19,11 +23,17 @@ AVRWeapon::AVRWeapon()
 	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
 
-	BaseDamage = 20.0f;
+	MuzzleSocketName = "MuzzleSocket";
+	TracerTargetName = "Target";
+
+	BaseDamage = 5.0f;
 	BulletSpread = 2.0f;
 	RateOfFire = 600;
 
 	SetReplicates(true);
+
+	NetUpdateFrequency = 66.0f;
+	MinNetUpdateFrequency = 33.0f;
 }
 
 // Called when the game starts or when spawned
@@ -42,7 +52,7 @@ void AVRWeapon::Fire()
 	{
 		ServerFire();
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("Fire in VRWeapon.cpp"));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("Fire in VRWeapon.cpp"));
 	AActor* MyOwner = GetOwner();
 	if (MyOwner)
 	{
@@ -76,11 +86,11 @@ void AVRWeapon::Fire()
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Fire in VRWeapon.cpp %s"), *(sub1.ToString())));
 		//UE_LOG(LogTemp, Warning, TEXT("Fire in VRWeapon.cpp %s"), *(sub1.ToString()));
 
-		EPhysicalSurface SurfaceType = SurfaceType_Default;
+		//EPhysicalSurface SurfaceType = SurfaceType_Default;
 
 		FHitResult Hit;
 		
-		if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, ECC_Visibility, QueryParams))
+		if (GetWorld()->LineTraceSingleByChannel(Hit, FVector(CameraLocation.X - 20.0f, CameraLocation.Y + 15.0f, CameraLocation.Z - 20.0f), TraceEnd, ECC_GameTraceChannel1, QueryParams))
 		{
 			// Blocking hit! Process damage
 			AActor* HitActor = Hit.GetActor();
@@ -90,7 +100,7 @@ void AVRWeapon::Fire()
 			float ActualDamage = BaseDamage;
 			//if (SurfaceType == SURFACE_FLESHVULNERABLE)
 			//{
-				ActualDamage *= 4.0f;
+				//ActualDamage *= 4.0f;
 			//}
 
 			UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
@@ -103,28 +113,28 @@ void AVRWeapon::Fire()
 
 		//if (DebugWeaponDrawing > 0)
 		//{
-			DrawDebugLine(GetWorld(), FVector(CameraLocation.X-20.0f, CameraLocation.Y+15.0f, CameraLocation.Z-20.0f), TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
+		DrawDebugLine(GetWorld(), FVector(CameraLocation.X-20.0f, CameraLocation.Y+15.0f, CameraLocation.Z-20.0f), TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
 		//}
-/*
-		PlayFireEffects(TracerEndPoint);
 
+		//PlayFireEffects(TracerEndPoint);
+		
 		if (HasAuthority())
 		{
 			HitScanTrace.TraceTo = TracerEndPoint;
-			HitScanTrace.SurfaceType = SurfaceType;
-		}*/
+			//HitScanTrace.SurfaceType = SurfaceType;
+		}
 
 		LastFireTime = GetWorld()->TimeSeconds;
 	}
 }
 
-/*
-void ASWeapon::OnRep_HitScanTrace()
+
+void AVRWeapon::OnRep_HitScanTrace()
 {
 	// Play cosmetic FX
 	PlayFireEffects(HitScanTrace.TraceTo);
-	PlayImpactEffects(HitScanTrace.SurfaceType, HitScanTrace.TraceTo);
-}*/
+	//PlayImpactEffects(HitScanTrace.SurfaceType, HitScanTrace.TraceTo);
+}
 
 
 void AVRWeapon::ServerFire_Implementation()
@@ -149,7 +159,44 @@ void AVRWeapon::StartFire()
 void AVRWeapon::StopFire()
 {
 	GetWorldTimerManager().ClearTimer(TimerHandle_TimeBetweenShots);
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("StopFire in VRWeapon.cpp"));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("StopFire in VRWeapon.cpp"));
+}
+
+void AVRWeapon::PlayFireEffects(FVector TraceEnd)
+{
+	if (MuzzleEffect)
+	{
+		UGameplayStatics::SpawnEmitterAttached(MuzzleEffect, MeshComp, MuzzleSocketName);
+	}
+
+	if (TracerEffect)
+	{
+		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+
+		UParticleSystemComponent* TracerComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TracerEffect, MuzzleLocation);
+		if (TracerComp)
+		{
+			TracerComp->SetVectorParameter(TracerTargetName, TraceEnd);
+		}
+	}
+	/*
+	APawn* MyOwner = Cast<APawn>(GetOwner());
+	if (MyOwner)
+	{
+		APlayerController* PC = Cast<APlayerController>(MyOwner->GetController());
+		if (PC)
+		{
+			PC->ClientStartCameraShake(FireCamShake);
+		}
+	}*/
+}
+
+
+void AVRWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AVRWeapon, HitScanTrace, COND_SkipOwner);
 }
 
 // Called every frame

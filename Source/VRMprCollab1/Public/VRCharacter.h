@@ -7,6 +7,7 @@
 #include "VRCharacter.generated.h"
 
 class AVRWeapon;
+class UVRHealthComponent;
 
 UCLASS()
 class VRMPRCOLLAB1_API AVRCharacter : public ACharacter
@@ -21,6 +22,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UVRHealthComponent* HealthComp;
+
 	UPROPERTY(Replicated)
 	AVRWeapon* CurrentWeapon;
 
@@ -30,6 +34,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	FName WeaponAttachSocketName;
 
+	UFUNCTION()
+	void OnHealthChanged(UVRHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+	/* Pawn died previously */
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
+	bool bDied;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
