@@ -36,7 +36,7 @@ AVRTrackerBot::AVRTrackerBot()
 	SphereComp->SetupAttachment(RootComponent);
 
 	bUseVelocityChange = false;
-	MovementForce = 1000;
+	MovementForce = 2000;
 	RequiredDistanceToTarget = 100;
 
 	ExplosionDamage = 60;

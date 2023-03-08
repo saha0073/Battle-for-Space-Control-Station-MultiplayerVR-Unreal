@@ -12,6 +12,10 @@
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+//#include "HeadMountedDisplay/Public/XRSystem.h"
+//#include "Engine/GameEngine/"
+#include "IXRTrackingSystem.h"
+#include "IHeadMountedDisplay.h"
 
 
 // Sets default values
@@ -58,19 +62,54 @@ void AVRWeapon::Fire()
 	{
 		FVector EyeLocation;
 		FRotator EyeRotation;
-		MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+		FVector ShotDirection;
+		FVector CameraLocation;
 
-		FVector ShotDirection = EyeRotation.Vector();
+		//check if it's in VR mode
+		IHeadMountedDisplay* pHmd = nullptr;
+		TSharedPtr<IStereoRendering, ESPMode::ThreadSafe> pStereo = nullptr;
+		if (GEngine) {
+			pHmd = GEngine->XRSystem->GetHMDDevice();
+			pStereo = GEngine->XRSystem->GetStereoRenderingDevice();
+		}
+		
+		if (pHmd->IsHMDEnabled() && pHmd->IsHMDConnected() && pStereo->IsStereoEnabled()) {
+			// in VR mode
+			
 
-		// Bullet Spread
-		float HalfRad = FMath::DegreesToRadians(BulletSpread);
-		ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
+			FVector DevicePosition;
+			FQuat DeviceOrientation;
+			
+			GEngine->XRSystem->GetCurrentPose(IXRTrackingSystem::HMDDeviceId, DeviceOrientation, DevicePosition);
 
-		FVector CameraLocation = FVector(EyeLocation.X, EyeLocation.Y, EyeLocation.Z-60.0f);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("if Fire position in VRWeapon.cpp %s , rotation %s"), *DevicePosition.ToString(),*DeviceOrientation.ToString()));
+			UE_LOG(LogTemp, Warning, TEXT("if Fire position in VRWeapon.cpp %s , rotation %s"), *DevicePosition.ToString(), *DeviceOrientation.ToString());
+		
+			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+			FVector FinalPosition = MyOwner->GetActorRotation().RotateVector(DevicePosition) + PlayerController->PlayerCameraManager->GetCameraLocation();
+			
+			float HalfRad = FMath::DegreesToRadians(BulletSpread);
+			ShotDirection = DeviceOrientation.Vector();
+			ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
+			CameraLocation = FinalPosition;
+		}
+		else {
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("else Fire in VRWeapon.cpp")));
+			UE_LOG(LogTemp, Warning, TEXT("else Fire in VRWeapon.cpp"));
+
+			MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+			ShotDirection = EyeRotation.Vector();
+			
+			// Bullet Spread
+			float HalfRad = FMath::DegreesToRadians(BulletSpread);
+			ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
+			CameraLocation = FVector(EyeLocation.X, EyeLocation.Y, EyeLocation.Z - 60.0f);
+		}
+
 
 		FVector TraceEnd = CameraLocation + (ShotDirection * 10000);
 
-		TraceEnd.Z = CameraLocation.Z;
+		//TraceEnd.Z = CameraLocation.Z;
 
 		//FVector sub1 = TraceEnd - CameraLocation;
 
