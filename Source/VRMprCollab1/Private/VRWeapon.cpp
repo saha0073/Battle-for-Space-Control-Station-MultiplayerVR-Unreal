@@ -64,6 +64,8 @@ void AVRWeapon::Fire()
 		FRotator EyeRotation;
 		FVector ShotDirection;
 		FVector CameraLocation;
+		FVector TraceEnd;
+		FVector TracerEndPoint;
 
 		//check if it's in VR mode
 		IHeadMountedDisplay* pHmd = nullptr;
@@ -81,17 +83,26 @@ void AVRWeapon::Fire()
 			FQuat DeviceOrientation;
 			
 			GEngine->XRSystem->GetCurrentPose(IXRTrackingSystem::HMDDeviceId, DeviceOrientation, DevicePosition);
-
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("if Fire position in VRWeapon.cpp")));
-			UE_LOG(LogTemp, Warning, TEXT("if Fire position in VRWeapon.cpp"));
 		
 			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-			FVector FinalPosition = MyOwner->GetActorRotation().RotateVector(DevicePosition) + PlayerController->PlayerCameraManager->GetCameraLocation();
+			FVector FinalPosition = MyOwner->GetActorRotation().RotateVector(DevicePosition)+ PlayerController->PlayerCameraManager->GetCameraLocation();
 			
+			DeviceOrientation = DeviceOrientation - MyOwner->GetActorRotation().Quaternion();
+			GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Yellow, FString::Printf(TEXT("if Fire position in VRWeapon.cpp %s , %s"), *DeviceOrientation.ToString(), *FinalPosition.ToString()));
+			UE_LOG(LogTemp, Warning, TEXT("if Fire position in VRWeapon.cpp %s , %s"), *DeviceOrientation.ToString(), *FinalPosition.ToString());
+
 			float HalfRad = FMath::DegreesToRadians(BulletSpread);
 			ShotDirection = DeviceOrientation.Vector();
 			ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 			CameraLocation = FinalPosition;
+
+			TraceEnd = CameraLocation + (ShotDirection * 10000);
+
+			// Particle "Target" parameter
+			TracerEndPoint = TraceEnd;
+
+			CameraLocation = FVector(CameraLocation.X, CameraLocation.Y, CameraLocation.Z - 160.0f);
+			//CameraLocation.X - 40.0f, CameraLocation.Y + 15.0f, CameraLocation.Z - 80.0
 		}
 		else {
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("else Fire in VRWeapon.cpp")));
@@ -103,11 +114,17 @@ void AVRWeapon::Fire()
 			// Bullet Spread
 			float HalfRad = FMath::DegreesToRadians(BulletSpread);
 			ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
-			CameraLocation = FVector(EyeLocation.X, EyeLocation.Y, EyeLocation.Z - 60.0f);
+			CameraLocation = FVector(EyeLocation.X, EyeLocation.Y, EyeLocation.Z -20.0f);
+
+			TraceEnd = CameraLocation + (ShotDirection * 10000);
+
+			// Particle "Target" parameter
+			TracerEndPoint = TraceEnd;
+			CameraLocation = FVector(CameraLocation.X - 20.0f, CameraLocation.Y, CameraLocation.Z - 20.0f);
 		}
 
 
-		FVector TraceEnd = CameraLocation + (ShotDirection * 10000);
+		
 
 		//TraceEnd.Z = CameraLocation.Z;
 
@@ -119,8 +136,7 @@ void AVRWeapon::Fire()
 		QueryParams.bTraceComplex = true;
 		QueryParams.bReturnPhysicalMaterial = true;
 
-		// Particle "Target" parameter
-		FVector TracerEndPoint = TraceEnd;
+		
 
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Fire in VRWeapon.cpp %s"), *(sub1.ToString())));
 		//UE_LOG(LogTemp, Warning, TEXT("Fire in VRWeapon.cpp %s"), *(sub1.ToString()));
@@ -129,7 +145,7 @@ void AVRWeapon::Fire()
 
 		FHitResult Hit;
 		
-		if (GetWorld()->LineTraceSingleByChannel(Hit, FVector(CameraLocation.X - 20.0f, CameraLocation.Y + 15.0f, CameraLocation.Z - 20.0f), TraceEnd, ECC_GameTraceChannel1, QueryParams))
+		if (GetWorld()->LineTraceSingleByChannel(Hit, CameraLocation, TraceEnd, ECC_GameTraceChannel1, QueryParams))
 		{
 			// Blocking hit! Process damage
 			AActor* HitActor = Hit.GetActor();
@@ -144,7 +160,7 @@ void AVRWeapon::Fire()
 
 			UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), MyOwner, DamageType);
 
-			//PlayImpactEffects(SurfaceType, Hit.ImpactPoint);
+			PlayImpactEffects(Hit.ImpactPoint);
 
 			TracerEndPoint = Hit.ImpactPoint;
 
@@ -152,7 +168,7 @@ void AVRWeapon::Fire()
 
 		//if (DebugWeaponDrawing > 0)
 		//{
-		DrawDebugLine(GetWorld(), FVector(CameraLocation.X-20.0f, CameraLocation.Y+15.0f, CameraLocation.Z-20.0f), TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
+		DrawDebugLine(GetWorld(), CameraLocation, TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
 		//}
 
 		//PlayFireEffects(TracerEndPoint);
@@ -228,6 +244,19 @@ void AVRWeapon::PlayFireEffects(FVector TraceEnd)
 			PC->ClientStartCameraShake(FireCamShake);
 		}
 	}*/
+}
+
+void AVRWeapon::PlayImpactEffects(FVector ImpactPoint)
+{
+	
+	//if (SelectedEffect) {
+		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+
+		FVector ShotDirection = ImpactPoint - MuzzleLocation;
+		ShotDirection.Normalize();
+
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, ImpactPoint, ShotDirection.Rotation());
+	//}
 }
 
 
