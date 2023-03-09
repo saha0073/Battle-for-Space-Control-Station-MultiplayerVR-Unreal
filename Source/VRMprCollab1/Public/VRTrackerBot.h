@@ -8,6 +8,7 @@
 
 class UVRHealthComponent;
 class USphereComponent;
+class USoundCue;
 
 UCLASS()
 class VRMPRCOLLAB1_API AVRTrackerBot : public APawn
@@ -40,7 +41,7 @@ protected:
 	// Next point in navigation path
 	FVector NextPathPoint;
 
-	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	UPROPERTY(EditAnywhere, Category = "TrackerBot")
 	float MovementForce;
 
 	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
@@ -54,7 +55,7 @@ protected:
 
 	void SelfDestruct();
 
-	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	UPROPERTY(EditAnywhere, Category = "TrackerBot")
 	UParticleSystem* ExplosionEffect;
 
 	bool bExploded;
@@ -64,7 +65,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
 	float ExplosionRadius;
 
-	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	UPROPERTY(EditAnywhere, Category = "TrackerBot")
 	float ExplosionDamage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
@@ -73,6 +74,18 @@ protected:
 	FTimerHandle TimerHandle_SelfDamage;
 
 	void DamageSelf();
+
+	UPROPERTY(EditAnywhere, Category = "TrackerBot")
+		USoundCue* SelfDestructSound;
+
+	UPROPERTY(EditAnywhere, Category = "TrackerBot")
+		USoundCue* ExplodeSound;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "HealthComponent")
+	void BotShowUI(float HealthCng, bool BDoesDamage);
+
+	UPROPERTY(EditAnywhere, Category = "TrackerBot")
+	bool bDoesDamage;
 
 public:	
 	// Called every frame

@@ -82,8 +82,8 @@ void AVRWeapon::Fire()
 			
 			GEngine->XRSystem->GetCurrentPose(IXRTrackingSystem::HMDDeviceId, DeviceOrientation, DevicePosition);
 
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("if Fire position in VRWeapon.cpp %s , rotation %s"), *DevicePosition.ToString(),*DeviceOrientation.ToString()));
-			UE_LOG(LogTemp, Warning, TEXT("if Fire position in VRWeapon.cpp %s , rotation %s"), *DevicePosition.ToString(), *DeviceOrientation.ToString());
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("if Fire position in VRWeapon.cpp")));
+			UE_LOG(LogTemp, Warning, TEXT("if Fire position in VRWeapon.cpp"));
 		
 			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 			FVector FinalPosition = MyOwner->GetActorRotation().RotateVector(DevicePosition) + PlayerController->PlayerCameraManager->GetCameraLocation();

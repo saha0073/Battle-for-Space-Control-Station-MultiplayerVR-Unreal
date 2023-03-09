@@ -21,7 +21,7 @@ AVRCharacter::AVRCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
 
 	HealthComp = CreateDefaultSubobject<UVRHealthComponent>(TEXT("HealthComp"));
-
+	//HealthComp->OnHealthChanged.AddDynamic(this, &AVRCharacter::OnHealthChanged);
 }
 
 // Called when the game starts or when spawned
@@ -29,7 +29,7 @@ void AVRCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//HealthComp->OnHealthChanged.AddDynamic(this, &AVRCharacter::OnHealthChanged);
+	
 
 	if (HasAuthority())
 	{
@@ -68,8 +68,13 @@ void AVRCharacter::StopFire()
 void AVRCharacter::OnHealthChanged(UVRHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType,
 	class AController* InstigatedBy, AActor* DamageCauser)
 {
-	UE_LOG(LogTemp, Log, TEXT("OnHealthChanged in VRCharacter.cs"));
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("OnHealthChanged in VRCharacter.cs")));
+	//ShowUI(HealthDelta);
+
+	//UE_LOG(LogTemp, Log, TEXT("OnHealthChanged in VRCharacter.cs"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("OnHealthChanged in VRCharacter.cs")));
+	
+
+	/*
 	if (Health <= 0.0f && !bDied)
 	{
 		// Die!
@@ -82,7 +87,7 @@ void AVRCharacter::OnHealthChanged(UVRHealthComponent* OwningHealthComp, float H
 		//DetachFromControllerPendingDestroy();
 
 		//SetLifeSpan(10.0f);
-	}
+	}*/
 }
 
 

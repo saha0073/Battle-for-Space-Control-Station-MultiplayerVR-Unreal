@@ -13,6 +13,7 @@
 #include "Components/SphereComponent.h"
 #include "VRCharacter.h"
 #include "Engine/GameEngine.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 AVRTrackerBot::AVRTrackerBot()
@@ -36,13 +37,15 @@ AVRTrackerBot::AVRTrackerBot()
 	SphereComp->SetupAttachment(RootComponent);
 
 	bUseVelocityChange = false;
-	MovementForce = 2000;
+	MovementForce = 1000;
 	RequiredDistanceToTarget = 100;
 
 	ExplosionDamage = 60;
 	ExplosionRadius = 350;
 
 	SelfDamageInterval = 0.25f;
+
+	bDoesDamage = true; 
 }
 
 // Called when the game starts or when spawned
@@ -64,7 +67,7 @@ void AVRTrackerBot::HandleTakeDamage(UVRHealthComponent* OwningHealthComp, float
 	{
 		MatInst->SetScalarParameterValue("LastTimeDamageTaken", GetWorld()->TimeSeconds);
 	}
-
+	
 	//Explode on hitpoints==0
 	UE_LOG(LogTemp, Log, TEXT("Health %s of %s"), *FString::SanitizeFloat(Health), *GetName());
 
@@ -96,8 +99,10 @@ void AVRTrackerBot::SelfDestruct()
 		return;
 	}
 	bExploded = true;
+	BotShowUI(ExplosionDamage, bDoesDamage);
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation());
+	UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
 
 	MeshComp->SetVisibility(false, true);
 	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -110,6 +115,7 @@ void AVRTrackerBot::SelfDestruct()
 		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 12, FColor::Red, false, 2.0f, 0, 1.0f);
 
 		SetLifeSpan(2.0f);
+		
 	}
 	
 }
@@ -160,7 +166,7 @@ void AVRTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 
 			bStartedSelfDestruction = true;
 
-			//UGameplayStatics::SpawnSoundAttached(SelfDestructSound, RootComponent);
+			UGameplayStatics::SpawnSoundAttached(SelfDestructSound, RootComponent);
 		}
 	}
 

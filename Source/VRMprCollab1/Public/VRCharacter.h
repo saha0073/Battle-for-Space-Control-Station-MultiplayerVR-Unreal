@@ -40,6 +40,10 @@ protected:
 	/* Pawn died previously */
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
 	bool bDied;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "HealthComponent")
+	void ShowUI(float HealthCng);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

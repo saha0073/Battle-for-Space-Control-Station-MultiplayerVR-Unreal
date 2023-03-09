@@ -44,12 +44,12 @@ void UVRHealthComponent::OnRep_Health(float OldHealth)
 void UVRHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy,
 	AActor* DamageCauser)
 {
+	
 	if (bIsDead)
 	{
 		return;
 	}
 	
-
 	// Update health clamped
 	//Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
 
