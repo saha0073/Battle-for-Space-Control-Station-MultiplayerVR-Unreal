@@ -56,7 +56,7 @@ void UVRHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage,
 	Health = Health - Damage;
 
 	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health)));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health)));
 	
 	bIsDead = Health <= 0.0f;
 

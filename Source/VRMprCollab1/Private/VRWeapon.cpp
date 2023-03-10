@@ -67,6 +67,7 @@ void AVRWeapon::Fire()
 		FVector TraceEnd;
 		FVector TracerEndPoint;
 
+		/*
 		//check if it's in VR mode
 		IHeadMountedDisplay* pHmd = nullptr;
 		TSharedPtr<IStereoRendering, ESPMode::ThreadSafe> pStereo = nullptr;
@@ -87,9 +88,9 @@ void AVRWeapon::Fire()
 			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 			FVector FinalPosition = MyOwner->GetActorRotation().RotateVector(DevicePosition)+ PlayerController->PlayerCameraManager->GetCameraLocation();
 			
-			DeviceOrientation = DeviceOrientation - MyOwner->GetActorRotation().Quaternion();
-			GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Yellow, FString::Printf(TEXT("if Fire position in VRWeapon.cpp %s , %s"), *DeviceOrientation.ToString(), *FinalPosition.ToString()));
-			UE_LOG(LogTemp, Warning, TEXT("if Fire position in VRWeapon.cpp %s , %s"), *DeviceOrientation.ToString(), *FinalPosition.ToString());
+			DeviceOrientation = DeviceOrientation + MyOwner->GetActorRotation().Quaternion();
+			//GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Yellow, FString::Printf(TEXT("if Fire position in VRWeapon.cpp %s , %s"), *DeviceOrientation.ToString(), *FinalPosition.ToString()));
+			//UE_LOG(LogTemp, Warning, TEXT("if Fire position in VRWeapon.cpp %s , %s"), *DeviceOrientation.ToString(), *FinalPosition.ToString());
 
 			float HalfRad = FMath::DegreesToRadians(BulletSpread);
 			ShotDirection = DeviceOrientation.Vector();
@@ -103,10 +104,10 @@ void AVRWeapon::Fire()
 
 			CameraLocation = FVector(CameraLocation.X, CameraLocation.Y, CameraLocation.Z - 160.0f);
 			//CameraLocation.X - 40.0f, CameraLocation.Y + 15.0f, CameraLocation.Z - 80.0
-		}
-		else {
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("else Fire in VRWeapon.cpp")));
-			UE_LOG(LogTemp, Warning, TEXT("else Fire in VRWeapon.cpp"));
+		}*/
+		//else {
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("else Fire in VRWeapon.cpp")));
+			//UE_LOG(LogTemp, Warning, TEXT("else Fire in VRWeapon.cpp"));
 
 			MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 			ShotDirection = EyeRotation.Vector();
@@ -121,7 +122,7 @@ void AVRWeapon::Fire()
 			// Particle "Target" parameter
 			TracerEndPoint = TraceEnd;
 			CameraLocation = FVector(CameraLocation.X - 20.0f, CameraLocation.Y, CameraLocation.Z - 20.0f);
-		}
+		//}
 
 
 		

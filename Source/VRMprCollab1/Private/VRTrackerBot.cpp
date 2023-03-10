@@ -40,7 +40,7 @@ AVRTrackerBot::AVRTrackerBot()
 	MovementForce = 1000;
 	RequiredDistanceToTarget = 100;
 
-	ExplosionDamage = 60;
+	ExplosionDamage = 20;
 	ExplosionRadius = 350;
 
 	SelfDamageInterval = 0.25f;
@@ -112,7 +112,7 @@ void AVRTrackerBot::SelfDestruct()
 		IgnoredActors.Add(this);
 
 		UGameplayStatics::ApplyRadialDamage(this, ExplosionDamage, GetActorLocation(), ExplosionRadius, nullptr, IgnoredActors, this, GetInstigatorController(), true);
-		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 12, FColor::Red, false, 2.0f, 0, 1.0f);
+		//DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 12, FColor::Red, false, 2.0f, 0, 1.0f);
 
 		SetLifeSpan(2.0f);
 		
@@ -136,7 +136,7 @@ void AVRTrackerBot::Tick(float DeltaTime)
 	float DistanceToarget = (GetActorLocation() - NextPathPoint).Size();
 	if (DistanceToarget <= RequiredDistanceToTarget) {
 		NextPathPoint = GetNextPathPoint();
-		DrawDebugString(GetWorld(), GetActorLocation(), "Target Reached");
+		//DrawDebugString(GetWorld(), GetActorLocation(), "Target Reached");
 	}
 	else {
 		FVector ForceDirection = NextPathPoint - GetActorLocation();
@@ -154,7 +154,7 @@ void AVRTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 	UE_LOG(LogTemp, Log, TEXT("NotifyActorBeginOverlap() in VRTracker.cpp"));
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("NotifyActorBeginOverlap() in VRTracker.cpp")));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("NotifyActorBeginOverlap() in VRTracker.cpp")));
 
 	if (!bStartedSelfDestruction && !bExploded) {
 		AVRCharacter* PlayerPawn = Cast<AVRCharacter>(OtherActor);
