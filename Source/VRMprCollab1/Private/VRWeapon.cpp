@@ -67,7 +67,7 @@ void AVRWeapon::Fire()
 		FVector TraceEnd;
 		FVector TracerEndPoint;
 
-		/*
+		
 		//check if it's in VR mode
 		IHeadMountedDisplay* pHmd = nullptr;
 		TSharedPtr<IStereoRendering, ESPMode::ThreadSafe> pStereo = nullptr;
@@ -104,7 +104,7 @@ void AVRWeapon::Fire()
 
 			CameraLocation = FVector(CameraLocation.X, CameraLocation.Y, CameraLocation.Z - 160.0f);
 			//CameraLocation.X - 40.0f, CameraLocation.Y + 15.0f, CameraLocation.Z - 80.0
-		}*/
+		}
 		//else {
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("else Fire in VRWeapon.cpp")));
 			//UE_LOG(LogTemp, Warning, TEXT("else Fire in VRWeapon.cpp"));
