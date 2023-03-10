@@ -15,7 +15,7 @@ Battle for Space Control Station is powered by Unreal Engine 5, Unreal Multiplay
 * GameEngine: Unreal Engine 5.1
 * Tech Stack: C++, Blueprints
 * Technologies: Unreal Multiplayer, OpenXR, Ai
-* Features: weapon, Ai tracker ball (red, green, blue), health indicator 
+* Features: weapon, Ai tracker ball (red, green, blue) of various sizes and features, health indicator 
 
 ## Demo of playing the MultiplayerVR game
 You can check the following youtube video below.
