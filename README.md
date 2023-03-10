@@ -1,5 +1,5 @@
 # Battle-for-Space-Control-Station-MultiplayerVR-Unreal
-Thrilling MultiplayerVR game, powered by Unreal Engine 5, Unreal Multiplayer, OpenXR, and C++.
+Thrilling MultiplayerVR game, powered by Unreal Engine 5, Unreal Multiplayer, OpenXR, Ai, and C++.
 
 Battle for Space Control Station is a thrilling multiplayer VR game that immerses players in an intense space combat experience. 
 Made with Unreal Engine 5, the game features advanced weapon systems that allow players to engage in epic battles with other players to take down their opponents. 
