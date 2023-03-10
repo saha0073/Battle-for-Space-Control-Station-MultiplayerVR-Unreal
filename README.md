@@ -3,7 +3,7 @@ Thrilling MultiplayerVR game, powered by Unreal Engine 5, Unreal Multiplayer, Op
 
 Battle for Space Control Station is a thrilling multiplayer VR game that immerses players in an intense space combat experience. 
 Made with Unreal Engine 5, the game features advanced weapon systems that allow players to engage in epic battles with other players to take down their opponents. 
-In addition, the game includes Ai tracker balls of contrasting colors, sizes, and features, which players must strategically utilize to stay alive. 
+In addition, the game includes Ai tracker balls of CONTRASTING colors, sizes, and features, which players must strategically utilize to stay alive. 
 Green tracker balls are friendly and improve players' health, while red enemy tracker balls explode and pose a threat to players; 
 the larger the ball more dangerous it can be. Blue balls come with random features; these can either boost or damage health.
 
